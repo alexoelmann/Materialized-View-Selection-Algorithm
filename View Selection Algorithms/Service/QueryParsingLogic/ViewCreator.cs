@@ -73,7 +73,7 @@ namespace View_Selection_Algorithms.Service.QueryParsingLogic
                                 queryProjections = queryProjections
                                      .Replace(query.BaseRelation.First() + ".", projectionView.Name + ".");
                             
-                            var viewName = $"Result{query.QueryNumber}view";
+                            var viewName = $"{projectionView.Name.Split("2")[0].Trim()}result{query.QueryNumber}view";
                             var viewQuery = $"SELECT {queryProjections} FROM {projectionView.Name}";
                             var viewDefinition = $"CREATE VIEW {viewName} AS {viewQuery}";
                             var view = new View(viewName, viewDefinition, 0.0, 0.0);
@@ -96,7 +96,7 @@ namespace View_Selection_Algorithms.Service.QueryParsingLogic
                            queryProjections = queryProjections
                                 .Replace(table+".",join.Name+".");
                         }
-                        var viewName = $"Result{query.QueryNumber}view";
+                        var viewName = $"{join.Name.Split("view")[0].Trim()}result{query.QueryNumber}view";
                         var viewQuery = $"SELECT {queryProjections} FROM {join.Name}";
                         var viewDefinition = $"CREATE VIEW {viewName} AS {viewQuery}";
                         var view = new View(viewName, viewDefinition, 0.0, 0.0);

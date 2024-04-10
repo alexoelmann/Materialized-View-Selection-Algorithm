@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace View_Selection_Algorithms.Service.MaterializedViewCreationLogic
 {
-    internal class MaterializedViewCreator
+    public class MaterializedViewCreator
     {
+
     }
 }
