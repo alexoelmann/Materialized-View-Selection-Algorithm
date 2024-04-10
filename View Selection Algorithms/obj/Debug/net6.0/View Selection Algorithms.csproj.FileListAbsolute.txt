@@ -1,0 +1,24 @@
+C:\Users\Yasuo\source\repos\View Selection Algorithms\View Selection Algorithms\bin\Debug\net6.0\View Selection Algorithms.exe
+C:\Users\Yasuo\source\repos\View Selection Algorithms\View Selection Algorithms\bin\Debug\net6.0\View Selection Algorithms.deps.json
+C:\Users\Yasuo\source\repos\View Selection Algorithms\View Selection Algorithms\bin\Debug\net6.0\View Selection Algorithms.runtimeconfig.json
+C:\Users\Yasuo\source\repos\View Selection Algorithms\View Selection Algorithms\bin\Debug\net6.0\View Selection Algorithms.dll
+C:\Users\Yasuo\source\repos\View Selection Algorithms\View Selection Algorithms\bin\Debug\net6.0\View Selection Algorithms.pdb
+C:\Users\Yasuo\source\repos\View Selection Algorithms\View Selection Algorithms\bin\Debug\net6.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll
+C:\Users\Yasuo\source\repos\View Selection Algorithms\View Selection Algorithms\bin\Debug\net6.0\Microsoft.Extensions.Logging.Abstractions.dll
+C:\Users\Yasuo\source\repos\View Selection Algorithms\View Selection Algorithms\bin\Debug\net6.0\Newtonsoft.Json.dll
+C:\Users\Yasuo\source\repos\View Selection Algorithms\View Selection Algorithms\bin\Debug\net6.0\Npgsql.dll
+C:\Users\Yasuo\source\repos\View Selection Algorithms\View Selection Algorithms\bin\Debug\net6.0\System.Diagnostics.DiagnosticSource.dll
+C:\Users\Yasuo\source\repos\View Selection Algorithms\View Selection Algorithms\bin\Debug\net6.0\System.Text.Encodings.Web.dll
+C:\Users\Yasuo\source\repos\View Selection Algorithms\View Selection Algorithms\bin\Debug\net6.0\System.Text.Json.dll
+C:\Users\Yasuo\source\repos\View Selection Algorithms\View Selection Algorithms\bin\Debug\net6.0\runtimes\browser\lib\net6.0\System.Text.Encodings.Web.dll
+C:\Users\Yasuo\source\repos\View Selection Algorithms\View Selection Algorithms\obj\Debug\net6.0\View Selection Algorithms.csproj.AssemblyReference.cache
+C:\Users\Yasuo\source\repos\View Selection Algorithms\View Selection Algorithms\obj\Debug\net6.0\View Selection Algorithms.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Yasuo\source\repos\View Selection Algorithms\View Selection Algorithms\obj\Debug\net6.0\View Selection Algorithms.AssemblyInfoInputs.cache
+C:\Users\Yasuo\source\repos\View Selection Algorithms\View Selection Algorithms\obj\Debug\net6.0\View Selection Algorithms.AssemblyInfo.cs
+C:\Users\Yasuo\source\repos\View Selection Algorithms\View Selection Algorithms\obj\Debug\net6.0\View Selection Algorithms.csproj.CoreCompileInputs.cache
+C:\Users\Yasuo\source\repos\View Selection Algorithms\View Selection Algorithms\obj\Debug\net6.0\View Selection Algorithms.csproj.CopyComplete
+C:\Users\Yasuo\source\repos\View Selection Algorithms\View Selection Algorithms\obj\Debug\net6.0\View Selection Algorithms.dll
+C:\Users\Yasuo\source\repos\View Selection Algorithms\View Selection Algorithms\obj\Debug\net6.0\refint\View Selection Algorithms.dll
+C:\Users\Yasuo\source\repos\View Selection Algorithms\View Selection Algorithms\obj\Debug\net6.0\View Selection Algorithms.pdb
+C:\Users\Yasuo\source\repos\View Selection Algorithms\View Selection Algorithms\obj\Debug\net6.0\View Selection Algorithms.genruntimeconfig.cache
+C:\Users\Yasuo\source\repos\View Selection Algorithms\View Selection Algorithms\obj\Debug\net6.0\ref\View Selection Algorithms.dll
