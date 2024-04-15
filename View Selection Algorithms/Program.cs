@@ -12,7 +12,10 @@ public class Program
         var viewCreator =new ViewCreator();
         var views=viewCreator.GenerateAllViews(extractedQueryParts);
         var deterministicMCreator = new DeterministicMVPPCreator();
-        deterministicMCreator.ChooseMaterializedViews(views,extractedQueryParts);
+        //deterministicMCreator.ChooseMaterializedViews(views,extractedQueryParts);
+        var hybridMVPP = new HybridMVPP();
+        hybridMVPP.ChooseMaterializedViews(views,extractedQueryParts);
+        
         Console.WriteLine("Finish");
         Console.ReadKey();
     }
