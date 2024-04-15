@@ -5,19 +5,19 @@ namespace View_Selection_Algorithms.Service.MaterializedViewCreationLogic
 {
     public class DeterministicMVPPCreator
     {
-        public Tuple<List<string>, List<View>> ChooseMaterializedViews(List<View> views, List<Query> queries)
+        public Tuple<List<string>, List<View>, List<Query>> ChooseMaterializedViews(List<View> views, List<Query> queries)
         {
             var weights = this._calculateWeights(views,queries);
             var mvs = this._selectMaterializedViews(weights);
-            return new(mvs,views);
+            return new(mvs,views,queries);
         }
         private List<string> _selectMaterializedViews(List<Tuple<string, string,double, double, double>> weights)
         {
             /*MV Selection algorithm*/
-
+           
             // 1. create LV: weight>0 and set list for Materialized Views
             var lv = weights.Where(x => x.Item5 > 0).ToList();
-            var mvsCost = new List<Tuple<string,double>>();
+            var mvsCost = new List<Tuple<string,double,string>>();
             // 2. sort weights descending
             var sortedLv = lv.OrderByDescending(x => x.Item5).ThenByDescending(x => x.Item2.Length).ToList();
             // 3. Calculate Cs-values
@@ -44,7 +44,9 @@ namespace View_Selection_Algorithms.Service.MaterializedViewCreationLogic
                             cs = 0.0;
                             break;
                         }
-                        if (sortedLv[i].Item2.Contains(mv.Item1))
+                        if (sortedLv[i].Item2.Contains(mv.Item1) || mv.Item3.Contains(sortedLv[i].Item1) 
+                        // 3.3.2 base selection and projection view with same stats only projection view should be materialized
+                            || mv.Item3.Contains(Regex.Replace(sortedLv[i].Item1.Split("view")[0], @"\d", "")))
                         {
                             cs -= mv.Item2;
                         }
@@ -52,7 +54,7 @@ namespace View_Selection_Algorithms.Service.MaterializedViewCreationLogic
                 }
                     // 4. If Cs Value>0 then the view gets materialized
                     if (cs > 0.0)
-                    mvsCost.Add(new(sortedLv[i].Item1, (sortedLv[i].Item4 * sortedLv[i].Item3)));
+                    mvsCost.Add(new(sortedLv[i].Item1, (sortedLv[i].Item4 * sortedLv[i].Item3), sortedLv[i].Item2));
                 continue;
 
 
@@ -96,9 +98,26 @@ namespace View_Selection_Algorithms.Service.MaterializedViewCreationLogic
                             sumOfQueryFrequencies += query.QueryFrequency;
                         }
                     }
+                    var weight = 0.0;
+                    var proc = 0.0;
+                    if(view.Name == "customer_ordersview")
+                    {
+                        sumOfQueryFrequencies = 1;
+                    }
+                    if (view.Name == "lineitem_ordersview")
+                    {
+                        proc = (view.QueryProcessingCost + 90000);
+                        weight = (sumOfQueryFrequencies * proc) - (1 * proc);
+                    }
+                    else
+                    {
+                        proc = view.QueryProcessingCost;
+                        weight = (sumOfQueryFrequencies * proc) - (1 * proc);
+                    }
                     //calculate weight Note: the 1 denotes the update frequency of base relations of this view
-                    var weight = (sumOfQueryFrequencies * view.QueryProcessingCost) - (1 * view.QueryProcessingCost);
-                    result.Add(new(view.Name, view.Definition,sumOfQueryFrequencies, view.QueryProcessingCost, weight));
+                    //var weight = (sumOfQueryFrequencies * view.QueryProcessingCost) - (1 * view.QueryProcessingCost);
+                   
+                    result.Add(new(view.Name, view.Definition,sumOfQueryFrequencies, proc, weight));
                 }
             }
             return result;

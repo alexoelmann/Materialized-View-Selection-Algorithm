@@ -13,4 +13,8 @@
     <PackageReference Include="Npgsql" Version="8.0.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Output\" />
+  </ItemGroup>
+
 </Project>

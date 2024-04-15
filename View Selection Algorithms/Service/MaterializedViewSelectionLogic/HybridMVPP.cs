@@ -7,13 +7,13 @@ namespace View_Selection_Algorithms.Service.MaterializedViewCreationLogic
     public class HybridMVPP
     {
         private DatabaseConnector connector = new DatabaseConnector();
-        public Tuple<List<View>, List<View>> ChooseMaterializedViews(List<View> views, List<Query> queries)
+        public Tuple<List<View>, List<string>,List<Query>> ChooseMaterializedViews(List<View> views, List<Query> queries)
         {
             var mvs = this._selectMaterializedViews(views,queries);
-            var result = new Tuple<List<View>, List<View>>(views, mvs);
+            var result = new Tuple<List<View>, List<string>, List<Query>>(views, mvs,queries);
             return result;
         }
-        private List<View> _selectMaterializedViews(List<View> views, List<Query> queries)
+        private List<string> _selectMaterializedViews(List<View> views, List<Query> queries)
         {
             
             /* Genetic Algorithm  reference goldberg */
@@ -24,7 +24,7 @@ namespace View_Selection_Algorithms.Service.MaterializedViewCreationLogic
             // 2. Choose random popsize of n = amount of possible views
             var popSize = this._selectRandomLists(searchSpace, viewOrder.Count());
             // 3. Genetic algorithm generations with MaxGen = 10
-            var maxGen = 10;
+            var maxGen = 3;
             // 4. final population
             var finalPopulation = new List<Tuple<List<int>, double>>();
             for (var i=0; i<maxGen; i++)
@@ -71,16 +71,16 @@ namespace View_Selection_Algorithms.Service.MaterializedViewCreationLogic
                 var mutatedList = this._mutation(newPopulationAfterCrossover);
                 popSize = mutatedList.Select(x => x.Item1).ToList();
 
-                var u = 9;
+                Console.WriteLine($"Generation: {i}");
             }
             // 5 Select best configuration out of max generation
             var winnerOfLastGen = finalPopulation.OrderBy(x => x.Item2).Select(x => x.Item1).ToList().First();
-            var winnerViews = new List<View>();
+            var winnerViews = new List<string>();
             for(var i =0; i<winnerOfLastGen.Count(); i++)
             {
                 if (winnerOfLastGen[i] == 1)
                 {
-                    winnerViews.Add(views[i]);
+                    winnerViews.Add(views[i].Name);
                 }
             }
             return winnerViews;
@@ -279,7 +279,7 @@ namespace View_Selection_Algorithms.Service.MaterializedViewCreationLogic
                 connector.SQLQueryTableConnector($"DROP MATERIALIZED VIEW IF EXISTS {view.Item1.ToLower()};");
             }
             views.Reverse();
-            var fitness = sumQueryProcessingCosts + viewMaintenanceCosts;
+            var fitness = sumQueryProcessingCosts;
             var result = new Tuple<List<int>,double>(selectedMvs, fitness);
             return result;
 

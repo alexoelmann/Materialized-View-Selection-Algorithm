@@ -1,20 +1,13 @@
-﻿using View_Selection_Algorithms.Service.MaterializedViewCreationLogic;
-using View_Selection_Algorithms.Service.QueryParsingLogic;
+﻿using View_Selection_Algorithms.MVPPMainLogic;
 
 public class Program
 {
 
     public static void Main()
     {
-
-        var parser = new QueryParser();
-        var extractedQueryParts=parser.ExtractAllQueryParts();
-        var viewCreator =new ViewCreator();
-        var views=viewCreator.GenerateAllViews(extractedQueryParts);
-        var deterministicMCreator = new DeterministicMVPPCreator();
-        //deterministicMCreator.ChooseMaterializedViews(views,extractedQueryParts);
-        var hybridMVPP = new HybridMVPP();
-        hybridMVPP.ChooseMaterializedViews(views,extractedQueryParts);
+       
+        var mainLogic = new MainLogic();
+        mainLogic.Sequence();
         
         Console.WriteLine("Finish");
         Console.ReadKey();
