@@ -7,7 +7,8 @@ public class Program
     {
        
         var mainLogic = new MainLogic();
-        mainLogic.Sequence();
+        mainLogic.Sequence(5);
+        
         
         Console.WriteLine("Finish");
         Console.ReadKey();

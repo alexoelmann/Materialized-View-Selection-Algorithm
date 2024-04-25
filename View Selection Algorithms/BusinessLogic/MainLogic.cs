@@ -1,14 +1,17 @@
-﻿using View_Selection_Algorithms.Model;
+﻿using System.Diagnostics;
+using View_Selection_Algorithms.BusinessLogic;
+using View_Selection_Algorithms.Model;
+using View_Selection_Algorithms.Service;
 using View_Selection_Algorithms.Service.MaterializedViewCreationLogic;
-using View_Selection_Algorithms.Service.Measure;
 using View_Selection_Algorithms.Service.QueryParsingLogic;
 
 namespace View_Selection_Algorithms.MVPPMainLogic
 {
     public class MainLogic
     {
-        public void Sequence()
+        public void Sequence(int amountgenerations)
         {
+            var stopwatch = new Stopwatch();
             Console.WriteLine("Start query parsing");
             var parser = new QueryParser();
             var extractedQueryParts = parser.ExtractAllQueryParts();
@@ -16,11 +19,17 @@ namespace View_Selection_Algorithms.MVPPMainLogic
             var viewCreator = new ViewCreator();
             var views = viewCreator.GenerateAllViews(extractedQueryParts);
             Console.WriteLine("Start deterministic MVPP");
+            stopwatch.Start();
             var deterministicMCreator = new DeterministicMVPPCreator();
             var deterministicMvs=deterministicMCreator.ChooseMaterializedViews(views,extractedQueryParts);
+            stopwatch.Stop();
+            var elapsedTimeDeterministic = stopwatch.Elapsed;
             Console.WriteLine("Start hybrid MVPP");
+            stopwatch.Start();
             var hybridMVPP = new HybridMVPP();
-            var hybridMvs=hybridMVPP.ChooseMaterializedViews(views, extractedQueryParts);
+            var hybridMvs=hybridMVPP.ChooseMaterializedViews(views, extractedQueryParts,amountgenerations);
+            stopwatch.Stop();
+            var elapsedTimeHybrid = stopwatch.Elapsed;
             Console.WriteLine("Start calculating Measures");
             var measureCalculator = new MeasureCalculator();
 
@@ -46,7 +55,7 @@ namespace View_Selection_Algorithms.MVPPMainLogic
             //write to excel
             Console.WriteLine("Start writing to excel");
             var excelWriter = new ExcelWriter();
-            excelWriter.CreateBenchmarkFile(benchmarkResult);
+            excelWriter.CreateBenchmarkFile(benchmarkResult,elapsedTimeDeterministic,elapsedTimeHybrid);
         }
     }
 }

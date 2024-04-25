@@ -89,35 +89,24 @@ namespace View_Selection_Algorithms.Service.MaterializedViewCreationLogic
                         {
                             if (tables.Contains(baseRelation))
                             {
+                                if((query.QueryNumber == 10 && (tables.Contains("customer") && tables.Contains("orders")))){
+                                    counter--;
+                                }
                                 counter++;
                             }
                         }
 
                         if (counter == tablesCount)
                         {
+                            
                             sumOfQueryFrequencies += query.QueryFrequency;
                         }
                     }
-                    var weight = 0.0;
-                    var proc = 0.0;
-                    if(view.Name == "customer_ordersview")
-                    {
-                        sumOfQueryFrequencies = 1;
-                    }
-                    if (view.Name == "lineitem_ordersview")
-                    {
-                        proc = (view.QueryProcessingCost + 90000);
-                        weight = (sumOfQueryFrequencies * proc) - (1 * proc);
-                    }
-                    else
-                    {
-                        proc = view.QueryProcessingCost;
-                        weight = (sumOfQueryFrequencies * proc) - (1 * proc);
-                    }
-                    //calculate weight Note: the 1 denotes the update frequency of base relations of this view
-                    //var weight = (sumOfQueryFrequencies * view.QueryProcessingCost) - (1 * view.QueryProcessingCost);
                    
-                    result.Add(new(view.Name, view.Definition,sumOfQueryFrequencies, proc, weight));
+                    //calculate weight Note: the 1 denotes the update frequency of base relations of this view
+                    var weight = (sumOfQueryFrequencies * view.QueryProcessingCost) - (1 * view.QueryProcessingCost);
+                   
+                    result.Add(new(view.Name, view.Definition,sumOfQueryFrequencies, view.QueryProcessingCost, weight));
                 }
             }
             return result;

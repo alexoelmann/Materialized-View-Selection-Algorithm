@@ -7,13 +7,13 @@ namespace View_Selection_Algorithms.Service.MaterializedViewCreationLogic
     public class HybridMVPP
     {
         private DatabaseConnector connector = new DatabaseConnector();
-        public Tuple<List<View>, List<string>,List<Query>> ChooseMaterializedViews(List<View> views, List<Query> queries)
+        public Tuple<List<View>, List<string>,List<Query>> ChooseMaterializedViews(List<View> views, List<Query> queries, int amountgenerations)
         {
-            var mvs = this._selectMaterializedViews(views,queries);
+            var mvs = this._selectMaterializedViews(views,queries,amountgenerations);
             var result = new Tuple<List<View>, List<string>, List<Query>>(views, mvs,queries);
             return result;
         }
-        private List<string> _selectMaterializedViews(List<View> views, List<Query> queries)
+        private List<string> _selectMaterializedViews(List<View> views, List<Query> queries, int amountgenerations)
         {
             
             /* Genetic Algorithm  reference goldberg */
@@ -21,10 +21,11 @@ namespace View_Selection_Algorithms.Service.MaterializedViewCreationLogic
             // 1. Create overall search-space
             var viewOrder = this._createViewOrderString(views);
             var searchSpace = this._createSearchSpace(views);
+            this._materializeAllViews(viewOrder);
             // 2. Choose random popsize of n = amount of possible views
             var popSize = this._selectRandomLists(searchSpace, viewOrder.Count());
-            // 3. Genetic algorithm generations with MaxGen = 10
-            var maxGen = 3;
+            // 3. Genetic algorithm generations with MaxGen = 3
+            var maxGen = amountgenerations;
             // 4. final population
             var finalPopulation = new List<Tuple<List<int>, double>>();
             for (var i=0; i<maxGen; i++)
@@ -36,6 +37,7 @@ namespace View_Selection_Algorithms.Service.MaterializedViewCreationLogic
                     {
                         var fitness = this._calculateFitness(viewOrder, individium, queries);
                         finalPopulation.Add(fitness);
+                        break;
                     }
                 }
                 var newPopulation = new List<Tuple<List<int>,double>>();
@@ -83,6 +85,7 @@ namespace View_Selection_Algorithms.Service.MaterializedViewCreationLogic
                     winnerViews.Add(views[i].Name);
                 }
             }
+            this._dropAllViews(viewOrder);
             return winnerViews;
         }
         /* Mutation */
@@ -114,7 +117,7 @@ namespace View_Selection_Algorithms.Service.MaterializedViewCreationLogic
 
                 var child2 = new List<int>(result[1].Item1.GetRange(0, crossoverPoint));
                 child2.AddRange(result[0].Item1.GetRange(crossoverPoint, result[0].Item1.Count() - crossoverPoint));
-            var counter = 0;
+   
             var newResult = new List<Tuple<List<int>, double>>();
                 newResult.Add(new(child1, result[0].Item2));
             newResult.Add(new(child2, result[1].Item2));
@@ -149,17 +152,17 @@ namespace View_Selection_Algorithms.Service.MaterializedViewCreationLogic
                 if (selectedMvs[i] == 1)
                 {
 
-                    var mvQuery = $"CREATE MATERIALIZED VIEW {views[i].Item1} AS {views[i].Item2.Split("AS")[1].Trim()} WITH DATA";
-                    connector.SQLQueryTableConnector(mvQuery);
+                    //var mvQuery = $"CREATE MATERIALIZED VIEW {views[i].Item1} AS {views[i].Item2.Split("AS")[1].Trim()}";
+                    //connector.SQLQueryTableConnector(mvQuery);
                     mvs.Add(views[i]);
                     }
                 // else just view
-                else
-                {
-                    var viewQuery = $"CREATE VIEW {views[i].Item1} AS {views[i].Item2.Split("AS")[1].Trim()}";
-                    connector.SQLQueryTableConnector(viewQuery);
+                //else
+                //{
+                //    var viewQuery = $"CREATE VIEW {views[i].Item1} AS {views[i].Item2.Split("AS")[1].Trim()}";
+                //    connector.SQLQueryTableConnector(viewQuery);
 
-                }
+                //}
                 }
 
             // 2. Calculate viewMaintenance Costs
@@ -213,7 +216,7 @@ namespace View_Selection_Algorithms.Service.MaterializedViewCreationLogic
                 var queryFrequency = baseQuery.Item3;
                 foreach (var mv in mvs)
                 {
-
+                    
                     // View consists of the resultView for the query
                     if (mv.Item1.Contains("result"))
                     {
@@ -245,6 +248,10 @@ namespace View_Selection_Algorithms.Service.MaterializedViewCreationLogic
                     // if all tables of the views are inside the query then we can use it
                     if (counter == tablesCount)
                     {
+                        if (baseQuery.Item2 == 10 && !tables.Contains("lineitem"))
+                        {
+                            continue;
+                        }
                         foreach (var table in tables) {
                             newQuery = newQuery.Replace(table + ", ", mv.Item1 + ", ").Replace(table + " ", mv.Item1 + " ").Replace(table + ".", mv.Item1 + ".");
                                 }
@@ -272,19 +279,36 @@ namespace View_Selection_Algorithms.Service.MaterializedViewCreationLogic
                 sumQueryProcessingCosts += queryProcessingCost;
             }
             //Drop views again
-            views.Reverse();
-            foreach (var view in views)
-            {
-                connector.SQLQueryTableConnector($"DROP VIEW IF EXISTS {view.Item1.ToLower()};");
-                connector.SQLQueryTableConnector($"DROP MATERIALIZED VIEW IF EXISTS {view.Item1.ToLower()};");
-            }
-            views.Reverse();
+            //views.Reverse();
+            //foreach (var view in views)
+            //{
+            //    connector.SQLQueryTableConnector($"DROP VIEW IF EXISTS {view.Item1.ToLower()};");
+            //    connector.SQLQueryTableConnector($"DROP MATERIALIZED VIEW IF EXISTS {view.Item1.ToLower()};");
+            //}
+            //views.Reverse();
             var fitness = sumQueryProcessingCosts;
             var result = new Tuple<List<int>,double>(selectedMvs, fitness);
             return result;
 
         }
         /* Helper Methods */
+        private void _materializeAllViews(List<Tuple<string, string, int>> views)
+        {
+            for (var i = 0; i < views.Count(); i++)
+            {
+                
+                    var mvQuery = $"CREATE MATERIALIZED VIEW {views[i].Item1} AS {views[i].Item2.Split("AS")[1].Trim()}";
+                    connector.SQLQueryTableConnector(mvQuery);
+                }
+            }
+        private void _dropAllViews(List<Tuple<string, string, int>> views)
+        {
+            views.Reverse();
+            foreach (var view in views)
+            {
+                connector.SQLQueryTableConnector($"DROP MATERIALIZED VIEW IF EXISTS {view.Item1.ToLower()};");
+            }
+        }
         private List<int> _changeRandomElement(List<int> view)
         {
             var random = new Random();

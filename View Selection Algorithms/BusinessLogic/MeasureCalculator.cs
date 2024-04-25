@@ -1,25 +1,27 @@
 ﻿using System.Text.RegularExpressions;
 using View_Selection_Algorithms.Data;
 using View_Selection_Algorithms.Model;
+using View_Selection_Algorithms.Service;
 
-namespace View_Selection_Algorithms.Service.Measure
+namespace View_Selection_Algorithms.BusinessLogic
 {
     public class MeasureCalculator
     {
         private DatabaseConnector connector = new DatabaseConnector();
-        public List<Tuple<int, string, double,double, double,double,string>> CalculateMeasures(Tuple<List<string>, List<View>,string> materializedViews, List<Query> queries)
+        public List<Tuple<int, string, double, double, double, double, string>> CalculateMeasures(Tuple<List<string>, List<View>, string> materializedViews, List<Query> queries)
         {
             var result = new List<Tuple<int, string, double, double, double, double, string>>();
             if (materializedViews.Item3 == "No Algorithm")
             {
-                result = this._calculateMeasuresNoViews();
-            }else if (materializedViews.Item3 == "All Queries Materialized")
+                result = _calculateMeasuresNoViews();
+            }
+            else if (materializedViews.Item3 == "All Queries Materialized")
             {
-                result=this._calculateMeasuresAllQueriesMaterialized();
+                result = _calculateMeasuresAllQueriesMaterialized();
             }
             else
             {
-                result = this._calculateMeasuresWithAlgorithm(materializedViews, queries);
+                result = _calculateMeasuresWithAlgorithm(materializedViews, queries);
             }
             return result;
         }
@@ -86,7 +88,7 @@ namespace View_Selection_Algorithms.Service.Measure
                 }
             }
             //QueryProcessing Cost and speed
-            
+
             foreach (var query in baseQueries)
             {
                 var newQuery = query.Item1;
@@ -146,7 +148,7 @@ namespace View_Selection_Algorithms.Service.Measure
                         if (newQueryBaseRelations.Contains(","))
                         {
                             newQueryTables = newQueryBaseRelations.Split(",").ToList().Select(x => x.Trim()).ToList().Distinct().ToList();
-                            var newQueryTablesToString = String.Join(", ", newQueryTables);
+                            var newQueryTablesToString = string.Join(", ", newQueryTables);
                             var replacedFromPart = $" {newQueryTablesToString} ";
                             newQuery = newQuery.Replace(newQueryBaseRelations, replacedFromPart);
                         }
@@ -154,7 +156,7 @@ namespace View_Selection_Algorithms.Service.Measure
                 }
                 var queryProcessingCost = queryFrequency + connector.SQLQueryCostConnector(newQuery);
                 var queryProcessingTime = queryFrequency + connector.SQLQueryTimeConnector(newQuery);
-                result.Add(new(query.Item2, String.Join(", ", materializedViews.Item1), queryProcessingCost, queryProcessingTime, viewMaintenanceCosts, storageCosts, materializedViews.Item3));
+                result.Add(new(query.Item2, string.Join(", ", materializedViews.Item1), queryProcessingCost, queryProcessingTime, viewMaintenanceCosts, storageCosts, materializedViews.Item3));
             }
             //Drop views again
             materializedViews.Item2.Reverse();
@@ -165,14 +167,14 @@ namespace View_Selection_Algorithms.Service.Measure
             }
             materializedViews.Item2.Reverse();
             return result;
-       
+
         }
-            private List<Tuple<int, string, double, double, double, double, string>> _calculateMeasuresNoViews()
+        private List<Tuple<int, string, double, double, double, double, string>> _calculateMeasuresNoViews()
         {
             var baseQueries = new Queries().GetQueries();
-            var result = new List<Tuple<int, string, double, double, double, double,string>>();
+            var result = new List<Tuple<int, string, double, double, double, double, string>>();
 
-            foreach(var query in baseQueries)
+            foreach (var query in baseQueries)
             {
                 var queryProcessingCost = connector.SQLQueryCostConnector(query.Item1);
                 var queryNumber = query.Item2;
@@ -192,18 +194,31 @@ namespace View_Selection_Algorithms.Service.Measure
 
             foreach (var query in baseQueries)
             {
-                var mvQuery = $"CREATE MATERIALIZED VIEW view{query.Item2} AS {query.Item1.Replace(";","")} WITH DATA";
+                var mvQuery = $"CREATE MATERIALIZED VIEW view{query.Item2} AS {query.Item1.Replace(";", "")} WITH DATA";
                 connector.SQLQueryTableConnector(mvQuery);
                 var queryProcessingCost = connector.SQLQueryCostConnector($"SELECT * FROM view{query.Item2}");
                 var queryNumber = query.Item2;
                 var storageCost = connector.GetMVStorageCost($"view{query.Item2}");
-                var viewMaintenanceCosts = query.Item3* connector.SQLQueryCostConnector($"{query.Item1}");
+                var viewMaintenanceCosts = query.Item3 * connector.SQLQueryCostConnector($"{query.Item1}");
                 var queryProcessingTime = connector.SQLQueryTimeConnector($"SELECT * FROM view{query.Item2}");
                 var mvs = "All Queries";
                 var algorithm = "All Queries Materialized";
                 result.Add(new(queryNumber, mvs, queryProcessingCost, queryProcessingTime, viewMaintenanceCosts, storageCost, algorithm));
                 connector.SQLQueryTableConnector($"DROP MATERIALIZED VIEW IF EXISTS  view{query.Item2};");
             }
+            var sumStorageCost = 0.0;
+            var sumViewMaintenanceCost = 0.0;
+            foreach (var r in result)
+            {
+                sumStorageCost += r.Item6;
+                sumViewMaintenanceCost += r.Item5;
+            }
+            var newResult = new List<Tuple<int, string, double, double, double, double, string>>();
+            foreach (var r in result)
+            {
+                newResult.Add(new(r.Item1, r.Item2, r.Item3, r.Item4, sumViewMaintenanceCost, sumStorageCost, r.Item7));
+            }
+            result = newResult;
             return result;
         }
     }
