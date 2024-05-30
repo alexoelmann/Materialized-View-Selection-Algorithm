@@ -2,16 +2,15 @@
 {
     public class ExcelWriter
     {
-        public void CreateBenchmarkFile(List<Tuple<int, string, double, double, double, double, string>> results, TimeSpan executionTimeDeterministic, TimeSpan executionTimeHybrid)
+        public void CreateBenchmarkFile(List<Tuple<int, string, double, double, double, double, string>> results, TimeSpan executionTimeDeterministic, TimeSpan executionTimeHybrid, string outputName)
         {
-            //Path to Output folder
             var outputFolderPath = AppDomain.CurrentDomain.BaseDirectory.Split("bin")[0] + "Output\\";
 
             if (!Directory.Exists(outputFolderPath))
             {
                 Directory.CreateDirectory(outputFolderPath);
             }
-            var csvFilePathBenchmark = Path.Combine(outputFolderPath, "benchmarkTest.csv");
+            var csvFilePathBenchmark = Path.Combine(outputFolderPath, outputName);
             //write to csv
             using (var writer = new StreamWriter(csvFilePathBenchmark))
             {
@@ -25,7 +24,7 @@
                         writer.WriteLine($"{row.Item1}:{row.Item2}:{row.Item3}:{row.Item4}:{row.Item5}:{row.Item6}:{executionTimeDeterministic.TotalSeconds}:{row.Item7}");
                         continue;
                     }
-                    if (row.Item7 == "Hybrid MVPP")
+                    if (row.Item7.Contains("Hybrid MVPP"))
                     {
                         writer.WriteLine($"{row.Item1}:{row.Item2}:{row.Item3}:{row.Item4}:{row.Item5}:{row.Item6}:{executionTimeHybrid.TotalSeconds}:{row.Item7}");
                         continue;

@@ -1,0 +1,81 @@
+QueryNumber:Materialized Views:QueryProcessingCosts:QueryProcessingTime in ms:Maintenance Costs:Storage Costs:TimeSpan:Algorithm
+1:No:193551,11:1115:0:0:0:No
+2:No:35810,96:216:0:0:0:No
+3:No:45008,37:161:0:0:0:No
+4:No:34949,38:200:0:0:0:No
+5:No:165811,19:597:0:0:0:No
+6:No:5667:21:0:0:0:No
+7:No:171369,39:604:0:0:0:No
+8:No:5667:28:0:0:0:No
+9:No:33513,2:122:0:0:0:No
+10:No:150817,8:374:0:0:0:No
+11:No:42671,72:125:0:0:0:No
+12:No:36976,15:106:0:0:0:No
+13:No:35833,5:222:0:0:0:No
+14:No:36485,04:102:0:0:0:No
+15:No:150809,29:375:0:0:0:No
+16:No:150825,75:373:0:0:0:No
+17:No:31949,57:108:0:0:0:No
+18:No:48379,93:442:0:0:0:No
+19:No:150825,75:373:0:0:0:No
+20:No:36973,75:94:0:0:0:No
+1:All Queries:9638,4:47:1563895,8499999999:191365120:0:All Queries Materialized
+2:All Queries:2431,36:7:1563895,8499999999:191365120:0:All Queries Materialized
+3:All Queries:448:1:1563895,8499999999:191365120:0:All Queries Materialized
+4:All Queries:2149,12:7:1563895,8499999999:191365120:0:All Queries Materialized
+5:All Queries:389,12:1:1563895,8499999999:191365120:0:All Queries Materialized
+6:All Queries:113,92:0:1563895,8499999999:191365120:0:All Queries Materialized
+7:All Queries:194,56:0:1563895,8499999999:191365120:0:All Queries Materialized
+8:All Queries:347,52:1:1563895,8499999999:191365120:0:All Queries Materialized
+9:All Queries:572,16:2:1563895,8499999999:191365120:0:All Queries Materialized
+10:All Queries:17,5:0:1563895,8499999999:191365120:0:All Queries Materialized
+11:All Queries:208,64:0:1563895,8499999999:191365120:0:All Queries Materialized
+12:All Queries:17,8:0:1563895,8499999999:191365120:0:All Queries Materialized
+13:All Queries:2662,4:8:1563895,8499999999:191365120:0:All Queries Materialized
+14:All Queries:17,2:0:1563895,8499999999:191365120:0:All Queries Materialized
+15:All Queries:19,7:0:1563895,8499999999:191365120:0:All Queries Materialized
+16:All Queries:17,5:0:1563895,8499999999:191365120:0:All Queries Materialized
+17:All Queries:552,96:1:1563895,8499999999:191365120:0:All Queries Materialized
+18:All Queries:15381,76:102:1563895,8499999999:191365120:0:All Queries Materialized
+19:All Queries:15,3:0:1563895,8499999999:191365120:0:All Queries Materialized
+20:All Queries:17,5:0:1563895,8499999999:191365120:0:All Queries Materialized
+1:orders_lineitemview, orders_customerview, part_partsuppview, supplier2view:193551,11:1105:382510,99:152567808:0,0109763:Deterministic MVPP
+2:orders_lineitemview, orders_customerview, part_partsuppview, supplier2view:10669,01:128:382510,99:152567808:0,0109763:Deterministic MVPP
+3:orders_lineitemview, orders_customerview, part_partsuppview, supplier2view:7006,4:63:382510,99:152567808:0,0109763:Deterministic MVPP
+4:orders_lineitemview, orders_customerview, part_partsuppview, supplier2view:9877,7:72:382510,99:152567808:0,0109763:Deterministic MVPP
+5:orders_lineitemview, orders_customerview, part_partsuppview, supplier2view:8503,11:121:382510,99:152567808:0,0109763:Deterministic MVPP
+6:orders_lineitemview, orders_customerview, part_partsuppview, supplier2view:5667:21:382510,99:152567808:0,0109763:Deterministic MVPP
+7:orders_lineitemview, orders_customerview, part_partsuppview, supplier2view:8288,98:183:382510,99:152567808:0,0109763:Deterministic MVPP
+8:orders_lineitemview, orders_customerview, part_partsuppview, supplier2view:5667:15:382510,99:152567808:0,0109763:Deterministic MVPP
+9:orders_lineitemview, orders_customerview, part_partsuppview, supplier2view:10944,28:71:382510,99:152567808:0,0109763:Deterministic MVPP
+10:orders_lineitemview, orders_customerview, part_partsuppview, supplier2view:15373,52:59:382510,99:152567808:0,0109763:Deterministic MVPP
+11:orders_lineitemview, orders_customerview, part_partsuppview, supplier2view:7006,4:59:382510,99:152567808:0,0109763:Deterministic MVPP
+12:orders_lineitemview, orders_customerview, part_partsuppview, supplier2view:7034,7:60:382510,99:152567808:0,0109763:Deterministic MVPP
+13:orders_lineitemview, orders_customerview, part_partsuppview, supplier2view:10669,01:116:382510,99:152567808:0,0109763:Deterministic MVPP
+14:orders_lineitemview, orders_customerview, part_partsuppview, supplier2view:7006,4:38:382510,99:152567808:0,0109763:Deterministic MVPP
+15:orders_lineitemview, orders_customerview, part_partsuppview, supplier2view:9543,21:56:382510,99:152567808:0,0109763:Deterministic MVPP
+16:orders_lineitemview, orders_customerview, part_partsuppview, supplier2view:15405,19:58:382510,99:152567808:0,0109763:Deterministic MVPP
+17:orders_lineitemview, orders_customerview, part_partsuppview, supplier2view:10669,01:59:382510,99:152567808:0,0109763:Deterministic MVPP
+18:orders_lineitemview, orders_customerview, part_partsuppview, supplier2view:100992,96:292:382510,99:152567808:0,0109763:Deterministic MVPP
+19:orders_lineitemview, orders_customerview, part_partsuppview, supplier2view:15376,31:56:382510,99:152567808:0,0109763:Deterministic MVPP
+20:orders_lineitemview, orders_customerview, part_partsuppview, supplier2view:7034,7:46:382510,99:152567808:0,0109763:Deterministic MVPP
+1:lineitem2view, part_partsupp_supplierview, orders_lineitem_supplierview:10120,9:135:433863,86:149946368:27,4849637:Hybrid MVPP (Generation=10)
+2:lineitem2view, part_partsupp_supplierview, orders_lineitem_supplierview:13436,9:103:433863,86:149946368:27,4849637:Hybrid MVPP (Generation=10)
+3:lineitem2view, part_partsupp_supplierview, orders_lineitem_supplierview:45008,37:152:433863,86:149946368:27,4849637:Hybrid MVPP (Generation=10)
+4:lineitem2view, part_partsupp_supplierview, orders_lineitem_supplierview:34949,38:189:433863,86:149946368:27,4849637:Hybrid MVPP (Generation=10)
+5:lineitem2view, part_partsupp_supplierview, orders_lineitem_supplierview:665,6:3:433863,86:149946368:27,4849637:Hybrid MVPP (Generation=10)
+6:lineitem2view, part_partsupp_supplierview, orders_lineitem_supplierview:5667:9:433863,86:149946368:27,4849637:Hybrid MVPP (Generation=10)
+7:lineitem2view, part_partsupp_supplierview, orders_lineitem_supplierview:15519,56:678:433863,86:149946368:27,4849637:Hybrid MVPP (Generation=10)
+8:lineitem2view, part_partsupp_supplierview, orders_lineitem_supplierview:5667:28:433863,86:149946368:27,4849637:Hybrid MVPP (Generation=10)
+9:lineitem2view, part_partsupp_supplierview, orders_lineitem_supplierview:13604:87:433863,86:149946368:27,4849637:Hybrid MVPP (Generation=10)
+10:lineitem2view, part_partsupp_supplierview, orders_lineitem_supplierview:15402,44:61:433863,86:149946368:27,4849637:Hybrid MVPP (Generation=10)
+11:lineitem2view, part_partsupp_supplierview, orders_lineitem_supplierview:42671,72:142:433863,86:149946368:27,4849637:Hybrid MVPP (Generation=10)
+12:lineitem2view, part_partsupp_supplierview, orders_lineitem_supplierview:36976,15:107:433863,86:149946368:27,4849637:Hybrid MVPP (Generation=10)
+13:lineitem2view, part_partsupp_supplierview, orders_lineitem_supplierview:13436,9:72:433863,86:149946368:27,4849637:Hybrid MVPP (Generation=10)
+14:lineitem2view, part_partsupp_supplierview, orders_lineitem_supplierview:36485,04:107:433863,86:149946368:27,4849637:Hybrid MVPP (Generation=10)
+15:lineitem2view, part_partsupp_supplierview, orders_lineitem_supplierview:19412,82:74:433863,86:149946368:27,4849637:Hybrid MVPP (Generation=10)
+16:lineitem2view, part_partsupp_supplierview, orders_lineitem_supplierview:32806,18:78:433863,86:149946368:27,4849637:Hybrid MVPP (Generation=10)
+17:lineitem2view, part_partsupp_supplierview, orders_lineitem_supplierview:13436,9:60:433863,86:149946368:27,4849637:Hybrid MVPP (Generation=10)
+18:lineitem2view, part_partsupp_supplierview, orders_lineitem_supplierview:13174,4:85:433863,86:149946368:27,4849637:Hybrid MVPP (Generation=10)
+19:lineitem2view, part_partsupp_supplierview, orders_lineitem_supplierview:18919,82:76:433863,86:149946368:27,4849637:Hybrid MVPP (Generation=10)
+20:lineitem2view, part_partsupp_supplierview, orders_lineitem_supplierview:36973,75:106:433863,86:149946368:27,4849637:Hybrid MVPP (Generation=10)

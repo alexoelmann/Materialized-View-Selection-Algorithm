@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Yasuo\\source\\repos\\View Selection Algorithms\\View Selection Algorithms\\View Selection Algorithms.csproj": {}
+    "C:\\Users\\Yasuo\\source\\repos\\View Selection Algorithms - Kopie\\View Selection Algorithms\\View Selection Algorithms.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Yasuo\\source\\repos\\View Selection Algorithms\\View Selection Algorithms\\View Selection Algorithms.csproj": {
+    "C:\\Users\\Yasuo\\source\\repos\\View Selection Algorithms - Kopie\\View Selection Algorithms\\View Selection Algorithms.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Yasuo\\source\\repos\\View Selection Algorithms\\View Selection Algorithms\\View Selection Algorithms.csproj",
+        "projectUniqueName": "C:\\Users\\Yasuo\\source\\repos\\View Selection Algorithms - Kopie\\View Selection Algorithms\\View Selection Algorithms.csproj",
         "projectName": "View Selection Algorithms",
-        "projectPath": "C:\\Users\\Yasuo\\source\\repos\\View Selection Algorithms\\View Selection Algorithms\\View Selection Algorithms.csproj",
+        "projectPath": "C:\\Users\\Yasuo\\source\\repos\\View Selection Algorithms - Kopie\\View Selection Algorithms\\View Selection Algorithms.csproj",
         "packagesPath": "C:\\Users\\Yasuo\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Yasuo\\source\\repos\\View Selection Algorithms\\View Selection Algorithms\\obj\\",
+        "outputPath": "C:\\Users\\Yasuo\\source\\repos\\View Selection Algorithms - Kopie\\View Selection Algorithms\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Yasuo\\AppData\\Roaming\\NuGet\\NuGet.Config",

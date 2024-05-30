@@ -7,11 +7,9 @@ namespace View_Selection_Algorithms.Service
 {
     public class DatabaseConnector
     {
-        //TODO: Auslagern
-        private readonly string connectionString = "Host=localhost;Username=postgres;Password=superboo123;Database=TPCH-Benchmark;CommandTimeout=0";
+        private readonly string connectionString = "";
         public string SQLQueryTableConnector(string sqlQuery)
         {
-
             var result = string.Empty;
             using (NpgsqlConnection connection = new NpgsqlConnection(connectionString))
             {
@@ -19,19 +17,16 @@ namespace View_Selection_Algorithms.Service
                 {
                     connection.Open();
 
-                    Console.WriteLine("Verbindung erfolgreich geöffnet: execute query.");
-
-
                     using (NpgsqlCommand command = new NpgsqlCommand(sqlQuery, connection))
                     {
                         command.ExecuteNonQuery();
-                        Console.WriteLine("CREATE MATERIALIZED VIEW-Abfrage erfolgreich ausgeführt.");
+                        Console.WriteLine("CREATE MATERIALIZED VIEW successfully executed.");
                     }
 
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Fehler beim Öffnen der Verbindung oder Ausführen der Abfrage: {ex.Message}");
+                    Console.WriteLine($"Error: {ex.Message}");
                 }
 
             }
@@ -48,9 +43,7 @@ namespace View_Selection_Algorithms.Service
                 {
                     connection.Open();
 
-                    Console.WriteLine("Verbindung erfolgreich geöffnet.");
-
-                    string explainQuery = $"EXPLAIN   {sqlQuery}";
+                    var explainQuery = $"EXPLAIN   {sqlQuery}";
                     using (NpgsqlCommand command = new NpgsqlCommand(explainQuery, connection))
                     {
                         using (NpgsqlDataReader reader = command.ExecuteReader())
@@ -70,7 +63,7 @@ namespace View_Selection_Algorithms.Service
 
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Fehler beim Öffnen der Verbindung oder Ausführen der Abfrage: {ex.Message}");
+                    Console.WriteLine($"Error: {ex.Message}");
                 }
 
             }
@@ -79,20 +72,15 @@ namespace View_Selection_Algorithms.Service
         }
         public double SQLQueryTimeConnector(string sqlQuery)
         {
-
             var result = 0.0;
             var jsonResult = string.Empty;
             using (NpgsqlConnection connection = new NpgsqlConnection(connectionString))
             {
                 try
                 {
-                    // Öffnen Sie die Verbindung zur Datenbank
                     connection.Open();
 
-                    Console.WriteLine("Verbindung erfolgreich geöffnet.");
-
-
-                    string explainQuery = $"EXPLAIN  ANALYZE {sqlQuery}";
+                    var explainQuery = $"EXPLAIN  ANALYZE {sqlQuery}";
                     using (NpgsqlCommand command = new NpgsqlCommand(explainQuery, connection))
                     {
                         using (NpgsqlDataReader reader = command.ExecuteReader())
@@ -107,14 +95,11 @@ namespace View_Selection_Algorithms.Service
 
                         }
                     }
-
                 }
-
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Fehler beim Öffnen der Verbindung oder Ausführen der Abfrage: {ex.Message}");
+                    Console.WriteLine($"Error: {ex.Message}");
                 }
-
             }
             result = _getQueryProcessingTime(jsonResult);
             return result;
@@ -132,7 +117,6 @@ namespace View_Selection_Algorithms.Service
 
                 if (matchActual.Success)
                 {
-
                     var timeString = matchActual.Groups[0].Value;
                     timeString = timeString.Split("..")[1].Split(".")[0];
 
@@ -150,7 +134,6 @@ namespace View_Selection_Algorithms.Service
 
             try
             {
-
                 using (var conn = new NpgsqlConnection(connectionString))
                 {
                     conn.Open();
@@ -175,7 +158,7 @@ namespace View_Selection_Algorithms.Service
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Fehler beim Abrufen der Speicherkosten: {ex.Message}");
+                Console.WriteLine($"Error: {ex.Message}");
             }
             return storageCost;
         }
@@ -192,3 +175,4 @@ namespace View_Selection_Algorithms.Service
         }
     }
 }
+

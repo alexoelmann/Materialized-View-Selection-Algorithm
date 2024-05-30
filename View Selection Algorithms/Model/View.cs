@@ -2,7 +2,7 @@
 {
     public class View
     {
-        public string Name  { get; set; }
+        public string Name { get; set; }
         public string Definition { get; set; }
         public double QueryProcessingCost { get; set; }
         public double StorageCost { get; set; }
@@ -14,5 +14,5 @@
             this.QueryProcessingCost = queryProcessingCost;
             this.StorageCost = storageCost;
         }
-}
+    }
 }

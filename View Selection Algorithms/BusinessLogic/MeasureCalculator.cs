@@ -29,7 +29,8 @@ namespace View_Selection_Algorithms.BusinessLogic
         {
             var baseQueries = new Queries().GetQueries();
             var result = new List<Tuple<int, string, double, double, double, double, string>>();
-            var mvs = materializedViews.Item2.Where(x => materializedViews.Item1.Contains(x.Name)).ToList();
+            var mvs = materializedViews.Item2.Where(x => materializedViews.Item1.Contains(x.Name) && !x.Name.Contains("result")).ToList();
+            var mvsForOutput = materializedViews.Item1.Where(x => !x.Contains("result")).ToList();
 
             // Materialize Views and calculate storageCosts
             var storageCosts = 0.0;
@@ -40,7 +41,8 @@ namespace View_Selection_Algorithms.BusinessLogic
                 {
                     var mvQuery = $"CREATE MATERIALIZED VIEW {view.Name} AS {view.Definition.Split("AS")[1].Trim()} WITH DATA";
                     connector.SQLQueryTableConnector(mvQuery);
-                    storageCosts += connector.GetMVStorageCost(view.Name);
+
+                    storageCosts += view.StorageCost;
                 }
                 else
                 {
@@ -52,43 +54,10 @@ namespace View_Selection_Algorithms.BusinessLogic
             var viewMaintenanceCosts = 0.0;
             for (var i = 0; i < mvs.Count(); i++)
             {
-                if (mvs[i].Name.Contains("result"))
-                {
-                    var queryNumber = mvs[i].Name.Split("result")[1].Split("view")[0];
-                    var queryFrequency = queries.Where(x => x.QueryNumber == int.Parse(queryNumber)).Select(x => x.QueryFrequency).ToList().First();
-                    var viewDefinition = $"{mvs[i].Definition.Split("AS")[1].Trim()}";
-                    var viewMaintenanceCost = connector.SQLQueryCostConnector(viewDefinition);
-                    viewMaintenanceCosts += queryFrequency * viewMaintenanceCost;
-                }
-                else
-                {
-                    var tables = Regex.Replace(mvs[i].Name.Replace("view", "").Replace("result", ""), @"\d", "").Trim().Split("_").ToList();
-                    var tablesCount = tables.Count();
-                    // get the sum of all query frequencies this view uses
-                    var sumOfQueryFrequencies = 0.0;
-                    foreach (var query in queries)
-                    {
-                        var counter = 0;
-                        foreach (var baseRelation in query.BaseRelation)
-                        {
-                            if (tables.Contains(baseRelation))
-                            {
-                                counter++;
-                            }
-                        }
-
-                        if (counter == tablesCount)
-                        {
-                            sumOfQueryFrequencies += query.QueryFrequency;
-                        }
-                    }
-                    var viewDefinition = $"{mvs[i].Definition.Split("AS")[1].Trim()}";
-                    var viewMaintenanceCost = connector.SQLQueryCostConnector(viewDefinition);
-                    viewMaintenanceCosts += sumOfQueryFrequencies * viewMaintenanceCost;
-                }
+                viewMaintenanceCosts += mvs[i].QueryProcessingCost;
             }
             //QueryProcessing Cost and speed
-
+            mvs.Reverse();
             foreach (var query in baseQueries)
             {
                 var newQuery = query.Item1;
@@ -96,9 +65,9 @@ namespace View_Selection_Algorithms.BusinessLogic
                 newQuery = newQuery.Replace("\r", "").Replace("\n", " ");
                 var queryNumber = query.Item2;
                 var queryFrequency = query.Item3;
+
                 foreach (var mv in mvs)
                 {
-
                     // View consists of the resultView for the query
                     if (mv.Name.Contains("result"))
                     {
@@ -115,7 +84,22 @@ namespace View_Selection_Algorithms.BusinessLogic
                             continue;
                         }
                     }
-                    // not resultView
+
+                    var fromPartIndexCheck = newQuery.IndexOf("FROM") + 4;
+                    var queryEndIndexCheck = newQuery.IndexOf("WHERE");
+
+                    if (queryEndIndexCheck == -1)
+                    {
+                        queryEndIndexCheck = newQuery.IndexOf(";");
+                    }
+                    var newQueryBaseRelationsCheck = newQuery.Substring(fromPartIndexCheck, queryEndIndexCheck - fromPartIndexCheck);
+                    var tableCheck = newQueryBaseRelationsCheck.Split(',').ToList();
+                    var u = 9;
+                    if (tableCheck.Where(x => x.Trim().Contains("view") && x.Trim().Split("view")[0].Contains(mv.Name.Split("view")[0].Replace(@"\d", "").Trim())).Any())
+                    {
+                        continue;
+                    }
+
                     var parsedQueries = queries.Where(x => x.QueryNumber == queryNumber).ToList().First();
                     var tables = Regex.Replace(mv.Name.Replace("view", "").Replace("result", ""), @"\d", "").Trim().Split("_").ToList();
                     var tablesCount = tables.Count();
@@ -154,9 +138,40 @@ namespace View_Selection_Algorithms.BusinessLogic
                         }
                     }
                 }
-                var queryProcessingCost = queryFrequency + connector.SQLQueryCostConnector(newQuery);
-                var queryProcessingTime = queryFrequency + connector.SQLQueryTimeConnector(newQuery);
-                result.Add(new(query.Item2, string.Join(", ", materializedViews.Item1), queryProcessingCost, queryProcessingTime, viewMaintenanceCosts, storageCosts, materializedViews.Item3));
+                // Remove joins on same table to reduce redunancy and errors while parsing
+                var removedErrors = "";
+                if (newQuery.Contains("WHERE"))
+                {
+                    var whereIndex = newQuery.IndexOf("WHERE") + 5;
+                    var queryEndIndex = newQuery.IndexOf(";");
+                    var newQuerySelections = newQuery.Substring(whereIndex, queryEndIndex - whereIndex);
+
+                    if (newQuerySelections.Contains("AND"))
+                    {
+                        var splittedSelection = newQuerySelections.Split("AND");
+                        foreach (var selection in splittedSelection)
+                        {
+                            if (selection.Contains("=") && selection.Split("=")[0].Split(".")[0] == selection.Split("=")[1].Split(".")[0])
+                            {
+
+                                continue;
+                            }
+                            removedErrors += $"{selection} AND";
+                        }
+                        removedErrors = removedErrors + " ;";
+                        removedErrors = removedErrors.Trim().Replace("AND ;", ";");
+                        newQuery = newQuery.Split("WHERE")[0];
+                        if (removedErrors != ";")
+                        {
+                            newQuery = $"{newQuery} WHERE {removedErrors}";
+                        }
+                    }
+
+                }
+
+                var queryProcessingCost = queryFrequency * connector.SQLQueryCostConnector(newQuery);
+                var queryProcessingTime = queryFrequency * connector.SQLQueryTimeConnector(newQuery);
+                result.Add(new(query.Item2, string.Join(", ", mvsForOutput), queryProcessingCost, queryProcessingTime, viewMaintenanceCosts, storageCosts, materializedViews.Item3));
             }
             //Drop views again
             materializedViews.Item2.Reverse();
@@ -167,7 +182,6 @@ namespace View_Selection_Algorithms.BusinessLogic
             }
             materializedViews.Item2.Reverse();
             return result;
-
         }
         private List<Tuple<int, string, double, double, double, double, string>> _calculateMeasuresNoViews()
         {
@@ -199,7 +213,7 @@ namespace View_Selection_Algorithms.BusinessLogic
                 var queryProcessingCost = connector.SQLQueryCostConnector($"SELECT * FROM view{query.Item2}");
                 var queryNumber = query.Item2;
                 var storageCost = connector.GetMVStorageCost($"view{query.Item2}");
-                var viewMaintenanceCosts = query.Item3 * connector.SQLQueryCostConnector($"{query.Item1}");
+                var viewMaintenanceCosts = connector.SQLQueryCostConnector($"{query.Item1}");
                 var queryProcessingTime = connector.SQLQueryTimeConnector($"SELECT * FROM view{query.Item2}");
                 var mvs = "All Queries";
                 var algorithm = "All Queries Materialized";
@@ -223,3 +237,4 @@ namespace View_Selection_Algorithms.BusinessLogic
         }
     }
 }
+

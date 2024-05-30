@@ -10,20 +10,20 @@ namespace View_Selection_Algorithms.Service.QueryParsingLogic
         {
             var result = new List<View>();
             var baseSelectionViews = this._createBaseSelectionViews(queries);
-            var baseProjectionViews = this._createBaseProjectionViews(queries,baseSelectionViews);
-            var joinViews = this._createJoinViews(queries,baseProjectionViews);
-            var resultViews = this._createAllResultViews(queries,joinViews,baseProjectionViews);
+            var baseProjectionViews = this._createBaseProjectionViews(queries, baseSelectionViews);
+            var joinViews = this._createJoinViews(queries, baseProjectionViews);
+            var resultViews = this._createAllResultViews(queries, joinViews, baseProjectionViews);
             result.AddRange(baseSelectionViews);
             result.AddRange(baseProjectionViews);
             result.AddRange(joinViews);
-            
-            result = this._calculateQueryCostAndStorageCost(result,resultViews,baseSelectionViews,baseProjectionViews,joinViews);
+
+            result = this._calculateQueryCostAndStorageCost(result, resultViews, baseSelectionViews, baseProjectionViews, joinViews);
             return result;
         }
-        private List<View> _calculateQueryCostAndStorageCost(List<View> allViews, List<View> resultViews, List<View> baseSelectionViews, List<View> baseProjectionViews, List <View> joinViews)
+        private List<View> _calculateQueryCostAndStorageCost(List<View> allViews, List<View> resultViews, List<View> baseSelectionViews, List<View> baseProjectionViews, List<View> joinViews)
         {
             var result = new List<View>();
-            var viewsOrdered=allViews.OrderBy(x => x.Name.Length).ToList();
+            var viewsOrdered = allViews.OrderBy(x => x.Name.Length).ToList();
             viewsOrdered.AddRange(resultViews.OrderBy(x => x.Name.Length).ToList());
 
             var viewsOrderedReversed = resultViews.OrderByDescending(x => x.Name.Length).ToList();
@@ -33,15 +33,15 @@ namespace View_Selection_Algorithms.Service.QueryParsingLogic
 
             foreach (var view in viewsOrdered)
             {
-                
-                var queryProcessingCost=connector.SQLQueryCostConnector(view.Definition.Split("AS")[1].Trim());
+
+                var queryProcessingCost = connector.SQLQueryCostConnector(view.Definition.Split("AS")[1].Trim());
                 var mvQuery = $"CREATE MATERIALIZED VIEW {view.Name} AS {view.Definition.Split("AS")[1].Trim()} WITH DATA";
                 connector.SQLQueryTableConnector(mvQuery);
-                var storageCost=connector.GetMVStorageCost(view.Name.ToLower());
+                var storageCost = connector.GetMVStorageCost(view.Name.ToLower());
                 connector.SQLQueryTableConnector($"DROP MATERIALIZED VIEW IF EXISTS {view.Name.ToLower()};");
                 var viewDefinition = $"CREATE VIEW {view.Name} AS {view.Definition.Split("AS")[1].Trim()}";
                 connector.SQLQueryTableConnector(viewDefinition);
-                var newView = new View(view.Name, view.Definition,queryProcessingCost,storageCost);
+                var newView = new View(view.Name, view.Definition, queryProcessingCost, storageCost);
                 result.Add(newView);
 
             }
@@ -49,9 +49,9 @@ namespace View_Selection_Algorithms.Service.QueryParsingLogic
             {
                 connector.SQLQueryTableConnector($"DROP VIEW IF EXISTS {view.Name.ToLower()};");
             }
-                return result;
+            return result;
         }
-        private List<View> _createAllResultViews(List<Query> queries, List<View> joinViews,List<View> baseProjectionViews)
+        private List<View> _createAllResultViews(List<Query> queries, List<View> joinViews, List<View> baseProjectionViews)
         {
             var resultViews = new List<View>();
             foreach (var query in queries)
@@ -59,15 +59,15 @@ namespace View_Selection_Algorithms.Service.QueryParsingLogic
                 //Query has no prior joinView
                 if (!query.Join.Any())
                 {
-                    foreach(var projectionView in baseProjectionViews)
+                    foreach (var projectionView in baseProjectionViews)
                     {
                         if (projectionView.Name.Split("2")[0].Trim() == query.BaseRelation.First())
                         {
                             var queryProjections = String.Join(" , ", query.QueryProjectionColumn.Select(x => x.Item2).ToList());
-                            
-                                queryProjections = queryProjections
-                                     .Replace(query.BaseRelation.First() + ".", projectionView.Name + ".");
-                            
+
+                            queryProjections = queryProjections
+                                 .Replace(query.BaseRelation.First() + ".", projectionView.Name + ".");
+
                             var viewName = $"{projectionView.Name.Split("2")[0].Trim()}result{query.QueryNumber}view";
                             var viewQuery = $"SELECT {queryProjections} FROM {projectionView.Name}";
                             var viewDefinition = $"CREATE VIEW {viewName} AS {viewQuery}";
@@ -79,7 +79,7 @@ namespace View_Selection_Algorithms.Service.QueryParsingLogic
                 var tables = query.BaseRelation;
                 tables.Sort();
 
-                foreach(var join in joinViews)
+                foreach (var join in joinViews)
                 {
                     var joinViewtables = join.Name.Split("view")[0].Split("_").ToList();
                     joinViewtables.Sort();
@@ -88,8 +88,8 @@ namespace View_Selection_Algorithms.Service.QueryParsingLogic
                         var queryProjections = String.Join(" , ", query.QueryProjectionColumn.Select(x => x.Item2).ToList());
                         foreach (var table in tables)
                         {
-                           queryProjections = queryProjections
-                                .Replace(table+".",join.Name+".");
+                            queryProjections = queryProjections
+                                 .Replace(table + ".", join.Name + ".");
                         }
                         var viewName = $"{join.Name.Split("view")[0].Trim()}result{query.QueryNumber}view";
                         var viewQuery = $"SELECT {queryProjections} FROM {join.Name}";
@@ -99,10 +99,8 @@ namespace View_Selection_Algorithms.Service.QueryParsingLogic
                     }
 
                 }
-
-
             }
-                return resultViews;
+            return resultViews;
         }
         private List<View> _createJoinViews(List<Query> queries, List<View> allBaseProjectionViews)
         {
@@ -118,7 +116,7 @@ namespace View_Selection_Algorithms.Service.QueryParsingLogic
                     var queryJoinViews = new List<View>();
                     foreach (var join in query.Join)
                     {
-                 
+
                         //prior join view already exists
                         if (queryJoinViews.Count() > 0)
                         {
@@ -151,7 +149,7 @@ namespace View_Selection_Algorithms.Service.QueryParsingLogic
                                 }
 
                             }
-                            joinCondition = join.Item3.Replace(join.Item1, table1).Replace(join.Item2, table2);
+                            joinCondition = join.Item3.Replace(join.Item1 + ".", table1 + ".").Replace(join.Item2 + ".", table2 + ".");
                             var viewName = $"{join.Item1}_{join.Item2}view";
                             var viewQuery = $"SELECT * FROM {table1}, {table2} WHERE {joinCondition}";
                             var viewDefinition = $"CREATE VIEW {viewName} AS {viewQuery}";
@@ -165,7 +163,6 @@ namespace View_Selection_Algorithms.Service.QueryParsingLogic
             joinViews = joinViews.DistinctBy(x => x.Name).ToList();
             return joinViews;
         }
-            
         private List<View> _createBaseProjectionViews(List<Query> queries, List<View> allBaseSelectionViews)
         {
             var baseProjectionViews = new List<View>();
@@ -176,11 +173,12 @@ namespace View_Selection_Algorithms.Service.QueryParsingLogic
             {
                 var baseRelationProjections = allProjections.Where(x => x.Item1 == baseRelation).Select(x => x.Item2).Distinct().ToList();
                 //get tables from calculation columuns
-                for(var i=0; i < baseRelationProjections.Count(); i++)
+                for (var i = 0; i < baseRelationProjections.Count(); i++)
                 {
                     var baseProjectionsFromCalculationColumun = this._getColumnsFromExpression(baseRelationProjections[i]);
-                    //TODO: fix condition to read columuns
-                    if (baseProjectionsFromCalculationColumun != null && baseRelationProjections[i].Contains("(")) {
+
+                    if (baseProjectionsFromCalculationColumun != null && baseRelationProjections[i].Contains("("))
+                    {
                         baseRelationProjections.Remove(baseRelationProjections[i]);
                         baseRelationProjections.AddRange(baseProjectionsFromCalculationColumun);
                     }
@@ -193,29 +191,32 @@ namespace View_Selection_Algorithms.Service.QueryParsingLogic
                 else
                 {
                     projection = String.Join(" , ", baseRelationProjections);
-                    
+
                 }
                 //selection view for this table exists
                 if (allBaseSelectionViews.Where(x => x.Name.Split("1")[0] == baseRelation).Any())
-                    {
+                {
 
-                        foreach (var selection in allBaseSelectionViews)
+                    foreach (var selection in allBaseSelectionViews)
+                    {
+                        if (selection.Name.Split("1")[0].Trim() == baseRelation)
                         {
-                            if (selection.Name.Split("1")[0].Trim() == baseRelation)
-                            {
-                                var viewName = $"{baseRelation}2view";                                                           
-                                var viewQuery = $"SELECT {projection} FROM {baseRelation}";
-                                viewQuery = viewQuery.Replace(baseRelation, selection.Name);
-                                var viewDefinition = $"CREATE VIEW {viewName} AS {viewQuery}";
-                                var view = new View(viewName, viewDefinition, 0.0, 0.0);
-                                baseProjectionViews.Add(view);
-                            }
+
+                            var viewName = $"{baseRelation}2view";
+                            var viewQuery = $"SELECT {projection} FROM {baseRelation}";
+                            viewQuery = viewQuery.Replace(baseRelation + ".", selection.Name + ".");
+                            viewQuery = viewQuery.Replace("FROM " + baseRelation, "FROM " + selection.Name);
+                            var viewDefinition = $"CREATE VIEW {viewName} AS {viewQuery}";
+                            var view = new View(viewName, viewDefinition, 0.0, 0.0);
+                            baseProjectionViews.Add(view);
                         }
                     }
-                    else{
+                }
+                else
+                {
                     var viewName = $"{baseRelation}2view";
                     var viewQuery = $"SELECT {projection} FROM {baseRelation}";
-                    var viewDefinition = $"CREATE VIEW {viewName} AS {viewQuery}";                   
+                    var viewDefinition = $"CREATE VIEW {viewName} AS {viewQuery}";
                     var view = new View(viewName, viewDefinition, 0.0, 0.0);
                     baseProjectionViews.Add(view);
 
@@ -223,13 +224,13 @@ namespace View_Selection_Algorithms.Service.QueryParsingLogic
             }
             return baseProjectionViews;
         }
-            private List<View> _createBaseSelectionViews(List<Query> queries)
+        private List<View> _createBaseSelectionViews(List<Query> queries)
         {
             var baseSelectionViews = new List<View>();
             var allBaseRelations = queries.Select(x => x.BaseRelation).ToList().Distinct().SelectMany(x => x).Distinct().ToList();
 
             //Create BaseTable Selection Views
-            var allSelections = queries.Select(x => x.WhereCondition).ToList().Distinct().SelectMany(x => x).ToList();
+            var allSelections = queries.Select(x => x.SelectionCondition).ToList().Distinct().SelectMany(x => x).ToList();
 
             foreach (var baseRelation in allBaseRelations)
             {
@@ -250,9 +251,7 @@ namespace View_Selection_Algorithms.Service.QueryParsingLogic
                     var viewDefinition = $"CREATE VIEW {viewName} AS {viewQuery}";
                     var view = new View(viewName, viewDefinition, 0.0, 0.0);
                     baseSelectionViews.Add(view);
-
                 }
-
             }
             return baseSelectionViews;
         }
@@ -267,7 +266,6 @@ namespace View_Selection_Algorithms.Service.QueryParsingLogic
             {
                 columns.Add(match.Value);
             }
-
             return columns;
         }
     }

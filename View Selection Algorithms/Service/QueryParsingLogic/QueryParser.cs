@@ -9,36 +9,30 @@ namespace View_Selection_Algorithms.Service.QueryParsingLogic
         private string JoinPattern = @"^\s*\w+\.\w+\s*=\s*\w+\.\w+\s*$";
         public List<Query> ExtractAllQueryParts()
         {
-        
+
             var queries = new Queries().GetQueries();
             var result = new List<Query>();
             foreach (var query in queries)
             {
                 var extractedQuery = this._extractQueryPart(query);
                 result.Add(extractedQuery);
-            }  
+            }
             return result;
         }
         private Query _extractQueryPart(Tuple<string, int, double> baseQuery)
         {
-            //var extractedQuery = new Query();
             var query = baseQuery.Item1;
             var whereStatements = this._extractWhereStatements(query);
             var joins = this._extractJoinStatements(query);
-            //filter out relevant columuns for queries: in select, in selection and in joins
             var projections = this._extractProjectionColumuns(query, whereStatements, joins);
-            var baseRelations =this._extractBaseRelations(query);
+            var baseRelations = this._extractBaseRelations(query);
             var queryProjections = this._extractQueryProjectionColumuns(query);
             var queryNumber = baseQuery.Item2;
             var queryFrequency = baseQuery.Item3;
 
-            var parsedQuery = new Query(queryNumber, queryFrequency, joins, whereStatements, projections, baseRelations,queryProjections);
+            var parsedQuery = new Query(queryNumber, queryFrequency, joins, whereStatements, projections, baseRelations, queryProjections);
 
             return parsedQuery;
-            
-
-
-
         }
         private List<Tuple<string, string>> _extractQueryProjectionColumuns(string query)
         {
@@ -67,7 +61,7 @@ namespace View_Selection_Algorithms.Service.QueryParsingLogic
             }
             return result;
         }
-        private List<Tuple<string,string>> _extractProjectionColumuns(string query, List<Tuple<string, string>> whereStatements, List<Tuple<string, string, string>> joins)
+        private List<Tuple<string, string>> _extractProjectionColumuns(string query, List<Tuple<string, string>> whereStatements, List<Tuple<string, string, string>> joins)
         {
             var result = new List<Tuple<string, string>>();
             var projectionPartIndex = query.IndexOf("SELECT") + 6;
@@ -79,20 +73,20 @@ namespace View_Selection_Algorithms.Service.QueryParsingLogic
             var projections = projectionsPart.Split(",").ToList();
             string table;
             string column;
-            foreach(var projection in projections)
+            foreach (var projection in projections)
             {
                 table = projection.Split(".")[0].Trim();
                 column = projection.Trim();
                 result.Add(new Tuple<string, string>(table, column));
             }
             //get projections from selections
-            foreach(var selection in whereStatements)
+            foreach (var selection in whereStatements)
             {
                 table = selection.Item1;
                 column = selection.Item2.Split(" ")[0];
                 result.Add(new Tuple<string, string>(table, column));
             }
-            foreach(var join in joins)
+            foreach (var join in joins)
             {
                 table = join.Item1;
                 column = join.Item3.Split("=")[0].Trim();
@@ -120,7 +114,7 @@ namespace View_Selection_Algorithms.Service.QueryParsingLogic
             if (baseRelations.Contains(","))
             {
                 var tables = baseRelations.Split(',');
-                foreach(var table in tables)
+                foreach (var table in tables)
                 {
                     result.Add(table.Trim());
                 }
@@ -153,11 +147,11 @@ namespace View_Selection_Algorithms.Service.QueryParsingLogic
                     var whereClauseSplitted = whereClause.Split("AND");
                     var whereStatement = whereClauseSplitted.Where(x => !Regex.IsMatch(x, JoinPattern)).ToList();
 
-                    
-                    foreach(var statement in whereStatement)
+
+                    foreach (var statement in whereStatement)
                     {
                         table = statement.Split(".")[0].Trim();
-                        selection= statement.Trim();
+                        selection = statement.Trim();
                         result.Add(new Tuple<string, string>(table, selection));
                     }
 
@@ -165,7 +159,7 @@ namespace View_Selection_Algorithms.Service.QueryParsingLogic
                 //Query contains only one selection statement
                 else
                 {
-                    if(!Regex.IsMatch(whereClause, JoinPattern))
+                    if (!Regex.IsMatch(whereClause, JoinPattern))
                     {
                         table = whereClause.Split(".")[0].Trim();
                         selection = whereClause.Trim();
@@ -175,7 +169,7 @@ namespace View_Selection_Algorithms.Service.QueryParsingLogic
             }
             return result;
         }
-        private  List<Tuple<string, string, string>> _extractJoinStatements(string query)
+        private List<Tuple<string, string, string>> _extractJoinStatements(string query)
         {
             var result = new List<Tuple<string, string, string>>();
             var wherePartIndex = query.IndexOf("FROM") + 4;
@@ -197,13 +191,12 @@ namespace View_Selection_Algorithms.Service.QueryParsingLogic
                     whereClauseSplitted[0] = whereClauseSplitted[0].Split("WHERE")[1].Trim();
                     var whereStatement = whereClauseSplitted.Where(x => Regex.IsMatch(x, JoinPattern)).ToList();
 
-
                     foreach (var statement in whereStatement)
                     {
                         table1 = statement.Split("=")[0].Trim().Split(".")[0].Trim();
                         table2 = statement.Split("=")[1].Trim().Split(".")[0].Trim();
                         join = statement.Trim();
-                        result.Add(new Tuple<string, string,string>(table1, table2,join));
+                        result.Add(new Tuple<string, string, string>(table1, table2, join));
                     }
 
                 }
