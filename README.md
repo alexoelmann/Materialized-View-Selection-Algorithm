@@ -1,7 +1,7 @@
 # Benchmark of View Selection Algorithmn
 
 This repository contains the source code for the evaluation platform presented in the bachelorthesis "Benchmark of View Selection Algorithms".  
-As part of this paper, we re-implemented 2 View Selection Algorithms ([references](docs/References.md) listed below):
+As part of this paper, we re-implemented 2 View Selection Algorithms ([references](docs/REFERENCES.md) listed below):
 
 Deterministic MVPP [1] [2]  
 Hybrid MVPP [3]
@@ -20,14 +20,14 @@ The form of this variable must look like this: **"Host=host;Username=username;Pa
 ## Usage
 The application is written in C# (.NET Version 6.0) and its recommended to use [Visual Studio](https://visualstudio.microsoft.com/) as the IDE.  
 We used the Visual Studio version 17.3.6.  
-For the communication between PostgreSQL and the C# application it is mandatory to install the package [Npgsql](https://www.npgsql.org/) in our NuGet-packages.
+For the communication between PostgreSQL and the C# application it is mandatory to install the package [Npgsql](https://www.npgsql.org/) in our NuGet-packages.  
 To run the application just set the desired amount of generations and the name of the output csv inside the paramater of the function `mainLogic.Sequence(int NumGeneration, string outputFileName)`.
 
 ## References
 [1]  Yang, J., Karlapalem, K., Li, Q.: A framework for designing materialized
 views in data warehousing environment. In: Proceedings of 17th
 International Conference on Distributed Computing Systems. pp. 458–465
-(1997)
+(1997)  
 [2] Yang, J., Karlapalem, K., Li, Q.: Algorithms for materialized view design in
 data warehousing environment. In VLDB pp. 136–145 (02 1970)  
 [3] Zhang, C., Yao, X., Yang, J.: An evolutionary approach to materialized
